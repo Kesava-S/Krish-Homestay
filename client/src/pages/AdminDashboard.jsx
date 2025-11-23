@@ -3,6 +3,7 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import API_URL from '../config';
 
 const AdminDashboard = () => {
     const [dateRange, setDateRange] = useState(null);
@@ -24,7 +25,7 @@ const AdminDashboard = () => {
 
     const fetchData = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/calendar-data');
+            const res = await fetch(`${API_URL}/api/calendar-data`);
             const data = await res.json();
             setCalendarData(data);
         } catch (err) {
@@ -53,7 +54,7 @@ const AdminDashboard = () => {
         }
 
         try {
-            const res = await fetch('http://localhost:5000/api/admin/rules', {
+            const res = await fetch(`${API_URL}/api/admin/rules`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ rules: datesToUpdate })

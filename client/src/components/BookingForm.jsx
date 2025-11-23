@@ -4,6 +4,7 @@ import 'react-calendar/dist/Calendar.css';
 import { format } from 'date-fns';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import API_URL from '../config';
 import './BookingForm.css';
 
 // Initialize Stripe (Replace with your Publishable Key)
@@ -24,7 +25,7 @@ const CheckoutForm = ({ bookingData, onPaymentSuccess, onCancel }) => {
         }
 
         // 1. Create Payment Intent on Backend
-        const res = await fetch('http://localhost:5000/api/create-payment-intent', {
+        const res = await fetch(`${API_URL}/api/create-payment-intent`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ amount: bookingData.total_amount })
@@ -97,7 +98,7 @@ const BookingForm = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/calendar-data')
+        fetch(`${API_URL}/api/calendar-data`)
             .then(res => res.json())
             .then(data => {
                 setCalendarData(data);
@@ -170,7 +171,7 @@ const BookingForm = () => {
         const totalAmount = calculateTotal();
 
         try {
-            const res = await fetch('http://localhost:5000/api/bookings', {
+            const res = await fetch(`${API_URL}/api/bookings`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
