@@ -227,6 +227,7 @@ const Home = () => {
                 </div>
                 <div className="text-center mt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
                     <p>&copy; 2025 Krish Homestay. All rights reserved.</p>
+                    <Link to="/admin" style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.8rem', textDecoration: 'none', marginLeft: '10px' }}>Admin</Link>
                 </div>
             </footer>
         </div >

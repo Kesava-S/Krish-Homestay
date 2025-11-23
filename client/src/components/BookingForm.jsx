@@ -85,7 +85,7 @@ const CheckoutForm = ({ bookingData, onPaymentSuccess, onCancel }) => {
 
 const BookingForm = () => {
     const [dateRange, setDateRange] = useState(null);
-    const [bookedDates, setBookedDates] = useState([]);
+    const [calendarData, setCalendarData] = useState({ bookedRanges: [], rules: {} });
     const [formData, setFormData] = useState({
         guest_name: '',
         email: '',
@@ -97,23 +97,49 @@ const BookingForm = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/availability')
+        fetch('http://localhost:5000/api/calendar-data')
             .then(res => res.json())
             .then(data => {
-                setBookedDates(data);
+                setCalendarData(data);
             })
             .catch(err => console.error(err));
     }, []);
 
-    const isDateBooked = (date) => {
-        return bookedDates.some(booking => {
-            const start = new Date(booking.check_in_date);
-            const end = new Date(booking.check_out_date);
+    const isDateUnavailable = (date) => {
+        const dateStr = format(date, 'yyyy-MM-dd');
+
+        // Check if blocked by admin
+        if (calendarData.rules[dateStr]?.status === 'blocked') return true;
+
+        // Check if booked
+        return calendarData.bookedRanges.some(range => {
+            const start = new Date(range.start);
+            const end = new Date(range.end);
             start.setHours(0, 0, 0, 0);
             end.setHours(0, 0, 0, 0);
-            date.setHours(0, 0, 0, 0);
-            return date >= start && date < end;
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            return d >= start && d < end;
         });
+    };
+
+    const getPriceForDate = (date) => {
+        const dateStr = format(date, 'yyyy-MM-dd');
+        return calendarData.rules[dateStr]?.price || 7000;
+    };
+
+    const calculateTotal = () => {
+        if (!dateRange || !dateRange[0] || !dateRange[1]) return 0;
+        let total = 0;
+        let current = new Date(dateRange[0]);
+        const end = new Date(dateRange[1]);
+
+        // Iterate through nights (start date inclusive, end date exclusive)
+        while (current < end) {
+            total += getPriceForDate(current);
+            current.setDate(current.getDate() + 1);
+        }
+        return total;
     };
 
     const handleDetailsSubmit = (e) => {
@@ -141,8 +167,7 @@ const BookingForm = () => {
         setLoading(true);
         const checkIn = dateRange[0];
         const checkOut = dateRange[1];
-        const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-        const totalAmount = nights * 2500;
+        const totalAmount = calculateTotal();
 
         try {
             const res = await fetch('http://localhost:5000/api/bookings', {
@@ -157,7 +182,8 @@ const BookingForm = () => {
             });
 
             if (!res.ok) {
-                throw new Error('Booking failed after payment');
+                const errData = await res.json();
+                throw new Error(errData.error || 'Booking failed after payment');
             }
 
             setStep('success');
@@ -180,7 +206,14 @@ const BookingForm = () => {
     }
 
     const nights = dateRange && dateRange[0] && dateRange[1] ? Math.ceil((dateRange[1] - dateRange[0]) / (1000 * 60 * 60 * 24)) : 0;
-    const totalAmount = nights * 2500;
+    const totalAmount = calculateTotal();
+
+    const getTileContent = ({ date, view }) => {
+        if (view !== 'month') return null;
+        if (isDateUnavailable(date)) return null;
+        const price = getPriceForDate(date);
+        return <div style={{ fontSize: '10px', color: '#888', marginTop: '2px' }}>₹{price}</div>;
+    };
 
     return (
         <div className="booking-container glass-card">
@@ -193,7 +226,8 @@ const BookingForm = () => {
                             selectRange={true}
                             onChange={setDateRange}
                             value={dateRange}
-                            tileDisabled={({ date }) => isDateBooked(date)}
+                            tileDisabled={({ date }) => isDateUnavailable(date)}
+                            tileContent={getTileContent}
                             minDate={new Date()}
                             className="custom-calendar"
                         />

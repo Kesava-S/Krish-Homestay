@@ -1,9 +1,60 @@
 const express = require('express');
 const router = express.Router();
-const { getBookings, addBooking } = require('../services/sheetsService');
+const { getBookings, addBooking, getCalendarRules, updateCalendarRules } = require('../services/sheetsService');
 const { createCalendarEvent } = require('../services/calendarService');
 const { sendConfirmationEmail } = require('../services/emailService');
 const { createPaymentIntent } = require('../services/paymentService');
+
+// Admin Login
+router.post('/admin/login', (req, res) => {
+    const { username, password } = req.body;
+    if (username === 'Kesavaram Sundararaj' && password === 'Sundararaj@786') {
+        res.json({ success: true, token: 'admin-session-token' });
+    } else {
+        res.status(401).json({ error: 'Invalid credentials' });
+    }
+});
+
+// Get Calendar Data (Bookings + Rules)
+router.get('/calendar-data', async (req, res) => {
+    try {
+        const [bookings, rules] = await Promise.all([getBookings(), getCalendarRules()]);
+
+        // Process Bookings
+        const bookedDates = bookings
+            .filter(b => b.status === 'confirmed')
+            .map(b => ({
+                start: b.check_in_date,
+                end: b.check_out_date,
+                type: 'booked'
+            }));
+
+        // Process Rules (Price & Blocks)
+        const ruleData = rules.reduce((acc, rule) => {
+            acc[rule.date] = {
+                price: rule.price,
+                status: rule.status
+            };
+            return acc;
+        }, {});
+
+        res.json({ bookedRanges: bookedDates, rules: ruleData });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Update Calendar Rules (Admin)
+router.post('/admin/rules', async (req, res) => {
+    try {
+        const { rules } = req.body; // Array of { date, price, status }
+        await updateCalendarRules(rules);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 // Create Payment Intent
 router.post('/create-payment-intent', async (req, res) => {
@@ -13,26 +64,6 @@ router.post('/create-payment-intent', async (req, res) => {
         res.json({ clientSecret: paymentIntent.client_secret });
     } catch (err) {
         res.status(500).json({ error: err.message });
-    }
-});
-
-// Get availability (booked dates)
-router.get('/availability', async (req, res) => {
-    try {
-        const bookings = await getBookings();
-        // Filter only confirmed bookings
-        const confirmedBookings = bookings.filter(b => b.status === 'confirmed');
-
-        // Return just the dates needed for the frontend
-        const bookedDates = confirmedBookings.map(b => ({
-            check_in_date: b.check_in_date,
-            check_out_date: b.check_out_date
-        }));
-
-        res.json(bookedDates);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
     }
 });
 
@@ -46,20 +77,35 @@ router.post('/bookings', async (req, res) => {
 
     try {
         const bookings = await getBookings();
+        const rules = await getCalendarRules(); // Check for blocked dates too
 
-        // Check overlap
+        // Check overlap with bookings
         const newStart = new Date(check_in_date);
         const newEnd = new Date(check_out_date);
 
-        const hasOverlap = bookings.some(booking => {
+        const hasBookingOverlap = bookings.some(booking => {
             if (booking.status !== 'confirmed') return false;
             const start = new Date(booking.check_in_date);
             const end = new Date(booking.check_out_date);
             return (newStart < end && newEnd > start);
         });
 
-        if (hasOverlap) {
-            return res.status(409).json({ error: 'Dates already booked' });
+        // Check overlap with blocked dates
+        // We iterate through each day of the requested stay
+        let currentDate = new Date(newStart);
+        let hasBlockOverlap = false;
+        while (currentDate < newEnd) {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            const rule = rules.find(r => r.date === dateStr);
+            if (rule && rule.status === 'blocked') {
+                hasBlockOverlap = true;
+                break;
+            }
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        if (hasBookingOverlap || hasBlockOverlap) {
+            return res.status(409).json({ error: 'Dates not available' });
         }
 
         // Add to Google Sheet

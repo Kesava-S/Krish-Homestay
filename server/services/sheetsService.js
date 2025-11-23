@@ -1,7 +1,6 @@
 const { google } = require('googleapis');
 require('dotenv').config();
 
-// Authentication
 const auth = new google.auth.GoogleAuth({
     keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
@@ -10,20 +9,19 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: 'v4', auth });
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
+// --- Bookings ---
+
 async function getBookings() {
     try {
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'Bookings!A:H', // Assuming columns: ID, Name, Email, Phone, CheckIn, CheckOut, Guests, Status
+            range: 'Bookings!A:I',
         });
 
         const rows = response.data.values;
-        if (!rows || rows.length === 0) {
-            return [];
-        }
+        if (!rows || rows.length === 0) return [];
 
-        // Convert rows to objects (skipping header)
-        const bookings = rows.slice(1).map((row, index) => ({
+        return rows.slice(1).map(row => ({
             id: row[0],
             guest_name: row[1],
             email: row[2],
@@ -34,29 +32,25 @@ async function getBookings() {
             status: row[7],
             total_amount: row[8]
         }));
-
-        return bookings;
     } catch (error) {
-        console.error('Error fetching bookings from Sheets:', error);
+        console.error('Error fetching bookings:', error);
         return [];
     }
 }
 
 async function addBooking(booking) {
     try {
-        const values = [
-            [
-                Date.now().toString(), // Simple ID
-                booking.guest_name,
-                booking.email,
-                booking.phone,
-                booking.check_in_date,
-                booking.check_out_date,
-                booking.guests_count,
-                'confirmed', // Status
-                booking.total_amount
-            ],
-        ];
+        const values = [[
+            Date.now().toString(),
+            booking.guest_name,
+            booking.email,
+            booking.phone,
+            booking.check_in_date,
+            booking.check_out_date,
+            booking.guests_count,
+            'confirmed',
+            booking.total_amount
+        ]];
 
         await sheets.spreadsheets.values.append({
             spreadsheetId: SPREADSHEET_ID,
@@ -67,9 +61,82 @@ async function addBooking(booking) {
 
         return { ...booking, status: 'confirmed' };
     } catch (error) {
-        console.error('Error adding booking to Sheets:', error);
+        console.error('Error adding booking:', error);
         throw error;
     }
 }
 
-module.exports = { getBookings, addBooking };
+// --- Calendar Rules (Prices & Blocks) ---
+
+async function getCalendarRules() {
+    try {
+        // We assume a sheet named 'CalendarRules' exists with columns: Date, Price, Status
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId: SPREADSHEET_ID,
+            range: 'CalendarRules!A:C',
+        });
+
+        const rows = response.data.values;
+        if (!rows || rows.length === 0) return [];
+
+        // Skip header
+        return rows.slice(1).map(row => ({
+            date: row[0],
+            price: row[1] ? parseInt(row[1]) : null,
+            status: row[2] // 'available' or 'blocked'
+        }));
+    } catch (error) {
+        console.warn('Error fetching calendar rules (Sheet might not exist yet):', error.message);
+        return [];
+    }
+}
+
+async function updateCalendarRules(rules) {
+    // rules is an array of { date, price, status }
+    // This is a naive implementation: It reads all, updates in memory, and rewrites the sheet.
+    // For a small homestay (365 days), this is fine and safer than complex batch updates.
+
+    try {
+        const currentRules = await getCalendarRules();
+        const ruleMap = new Map();
+
+        // Load existing
+        currentRules.forEach(r => ruleMap.set(r.date, r));
+
+        // Apply updates
+        rules.forEach(r => {
+            if (ruleMap.has(r.date)) {
+                const existing = ruleMap.get(r.date);
+                ruleMap.set(r.date, { ...existing, ...r });
+            } else {
+                ruleMap.set(r.date, r);
+            }
+        });
+
+        // Convert back to array
+        const newRows = [['Date', 'Price', 'Status']];
+        for (const [date, rule] of ruleMap) {
+            newRows.push([date, rule.price || '', rule.status || 'available']);
+        }
+
+        // Clear and Write
+        await sheets.spreadsheets.values.clear({
+            spreadsheetId: SPREADSHEET_ID,
+            range: 'CalendarRules!A:C',
+        });
+
+        await sheets.spreadsheets.values.update({
+            spreadsheetId: SPREADSHEET_ID,
+            range: 'CalendarRules!A:C',
+            valueInputOption: 'USER_ENTERED',
+            resource: { values: newRows },
+        });
+
+        return true;
+    } catch (error) {
+        console.error('Error updating calendar rules:', error);
+        throw error;
+    }
+}
+
+module.exports = { getBookings, addBooking, getCalendarRules, updateCalendarRules };
