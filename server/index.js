@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const pool = require('./db');
+
 const apiRoutes = require('./routes/api');
 const fs = require('fs');
 const path = require('path');
@@ -11,12 +11,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Initialize DB
-const schemaPath = path.join(__dirname, 'schema.sql');
-const schemaSql = fs.readFileSync(schemaPath, 'utf8');
-pool.query(schemaSql)
-    .then(() => console.log('Database schema initialized'))
-    .catch(err => console.error('Error initializing database schema', err));
+// Initialize DB (Removed - using Google Sheets)
 
 // API Routes
 app.use('/api', apiRoutes);

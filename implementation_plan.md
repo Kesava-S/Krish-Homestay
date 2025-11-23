@@ -11,7 +11,7 @@
 - [x] Logo and Favicon Update
 
 ## Pending Tasks
-- [ ] Room Listing Component
-- [ ] Booking Form Implementation
-- [ ] API Integration for Bookings
-- [ ] Admin Dashboard (Optional)
+- [x] Room Listing Component
+- [x] Booking Form Implementation (Guest Count Updated)
+- [x] API Integration for Bookings (Calendar, Email, Payment)
+- [x] GitHub Repository Push
