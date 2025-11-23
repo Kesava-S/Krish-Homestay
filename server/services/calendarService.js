@@ -18,10 +18,17 @@ const calendar = google.calendar({ version: 'v3' });
 
 // This authentication strategy depends on how you want to configure it.
 // Using a Service Account is recommended for server-to-server apps.
-const auth = new google.auth.GoogleAuth({
-    keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+const authConfig = {
     scopes: SCOPES,
-});
+};
+
+if (process.env.GOOGLE_CREDENTIALS_JSON) {
+    authConfig.credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+} else {
+    authConfig.keyFile = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+}
+
+const auth = new google.auth.GoogleAuth(authConfig);
 
 async function createCalendarEvent(bookingDetails) {
     try {
