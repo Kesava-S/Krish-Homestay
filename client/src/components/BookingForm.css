@@ -1,0 +1,59 @@
+.booking-container {
+    padding: 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.booking-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 50px;
+}
+
+.custom-calendar {
+    width: 100%;
+    border: none !important;
+    border-radius: 15px;
+    padding: 10px;
+    font-family: 'Outfit', sans-serif !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.react-calendar__navigation button {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--primary);
+}
+
+.react-calendar__tile {
+    padding: 15px 0 !important;
+    border-radius: 8px;
+}
+
+.react-calendar__tile--active {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+.react-calendar__tile--now {
+    background: var(--secondary) !important;
+    color: white !important;
+}
+
+.react-calendar__tile:disabled {
+    background-color: #f0f0f0 !important;
+    color: #ccc !important;
+    cursor: not-allowed !important;
+}
+
+@media (max-width: 768px) {
+    .booking-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .booking-container {
+        padding: 20px;
+    }
+}
