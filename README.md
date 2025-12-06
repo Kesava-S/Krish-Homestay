@@ -55,6 +55,10 @@ The website will be available at `http://localhost:5173`.
 *   **Booking System**: Check availability, book dates, price calculation.
 *   **Admin API**: Endpoints to manage bookings (located in `server/routes/api.js`).
 
+## Documentation
+*   [**Setup Guide**](./README_SETUP.md): Instructions for setting up the environment, keys, and running the app.
+*   [**Developer Guide**](./DEVELOPER_GUIDE.md): Architecture overview, code structure, and how to contribute.
+
 ## Deployment
 1.  Build the frontend: `cd client && npm run build`.
 2.  Serve the `client/dist` folder from the Express server (uncomment the static file serving lines in `server/index.js`).
