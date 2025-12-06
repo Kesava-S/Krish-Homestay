@@ -1,19 +1,23 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const Razorpay = require('razorpay');
 
-async function createPaymentIntent(amount, currency = 'inr') {
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
+async function createOrder(amount, currency = 'INR') {
     try {
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: amount * 100, // Stripe expects amount in cents/paise
+        const options = {
+            amount: amount * 100, // amount in the smallest currency unit
             currency: currency,
-            automatic_payment_methods: {
-                enabled: true,
-            },
-        });
-        return paymentIntent;
+            receipt: `receipt_${Date.now()}`,
+        };
+        const order = await razorpay.orders.create(options);
+        return order;
     } catch (error) {
-        console.error('Error creating payment intent:', error);
+        console.error('Error creating Razorpay order:', error);
         throw error;
     }
 }
 
-module.exports = { createPaymentIntent };
+module.exports = { createOrder };

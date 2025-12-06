@@ -1,6 +1,6 @@
 # Krish Homestay - Google Sheets Backend Setup
 
-This project now uses **Google Sheets** as the database, **Google Calendar** for scheduling, and **Stripe** for payments.
+This project now uses **Google Sheets** as the database, **Google Calendar** for scheduling, and **Razorpay** for payments.
 
 ## 1. Google Cloud Setup (Sheets & Calendar)
 
@@ -40,10 +40,10 @@ This project now uses **Google Sheets** as the database, **Google Calendar** for
 2.  Go to "Settings and sharing" for the calendar you want to use (e.g., your primary one).
 3.  Under "Share with specific people", add the **Service Account email** and give it "Make changes to events" permission.
 
-## 4. Stripe Setup
+## 4. Razorpay Setup
 
-1.  Go to [dashboard.stripe.com](https://dashboard.stripe.com) and sign up/login.
-2.  Get your **Publishable Key** and **Secret Key** from the "Developers" > "API keys" section.
+1.  Go to [dashboard.razorpay.com](https://dashboard.razorpay.com) and sign up/login.
+2.  Go to "Settings" > "API Keys" and generate a new Key ID and Key Secret.
 
 ## 5. Environment Configuration
 
@@ -54,10 +54,15 @@ This project now uses **Google Sheets** as the database, **Google Calendar** for
     GOOGLE_APPLICATION_CREDENTIALS=./service-account.json
     EMAIL_USER=krishhomestays@gmail.com
     EMAIL_PASS=your_app_password
-    STRIPE_SECRET_KEY=your_stripe_secret_key
+    RAZORPAY_KEY_ID=your_razorpay_key_id
+    RAZORPAY_KEY_SECRET=your_razorpay_key_secret
     PORT=5000
     ```
-3.  In `client/src/components/BookingForm.jsx`, find `loadStripe('pk_test_...')` and replace the key with your **Stripe Publishable Key**.
+3.  In `client` folder, create `.env` (or `.env.local`) and add:
+    ```env
+    VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
+    VITE_API_URL=http://localhost:5000
+    ```
 
 ## 6. Run the Project
 

@@ -2,87 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { format } from 'date-fns';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import API_URL from '../config';
 import './BookingForm.css';
-
-// Initialize Stripe (Replace with your Publishable Key)
-const stripePromise = loadStripe('pk_test_51...'); // User needs to replace this
-
-const CheckoutForm = ({ bookingData, onPaymentSuccess, onCancel }) => {
-    const stripe = useStripe();
-    const elements = useElements();
-    const [error, setError] = useState(null);
-    const [processing, setProcessing] = useState(false);
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        setProcessing(true);
-
-        if (!stripe || !elements) {
-            return;
-        }
-
-        // 1. Create Payment Intent on Backend
-        const res = await fetch(`${API_URL}/api/create-payment-intent`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount: bookingData.total_amount })
-        });
-        const { clientSecret } = await res.json();
-
-        // 2. Confirm Card Payment
-        const result = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-                card: elements.getElement(CardElement),
-                billing_details: {
-                    name: bookingData.guest_name,
-                    email: bookingData.email,
-                },
-            },
-        });
-
-        if (result.error) {
-            setError(result.error.message);
-            setProcessing(false);
-        } else {
-            if (result.paymentIntent.status === 'succeeded') {
-                onPaymentSuccess();
-            }
-        }
-    };
-
-    return (
-        <form onSubmit={handleSubmit} className="payment-form">
-            <h3>Payment Details</h3>
-            <p>Total: ₹{bookingData.total_amount}</p>
-            <div className="card-element-container">
-                <CardElement options={{
-                    style: {
-                        base: {
-                            fontSize: '16px',
-                            color: '#424770',
-                            '::placeholder': {
-                                color: '#aab7c4',
-                            },
-                        },
-                        invalid: {
-                            color: '#9e2146',
-                        },
-                    },
-                }} />
-            </div>
-            {error && <div className="error-message">{error}</div>}
-            <div className="payment-actions">
-                <button type="button" onClick={onCancel} className="btn btn-secondary">Back</button>
-                <button type="submit" disabled={!stripe || processing} className="btn btn-primary">
-                    {processing ? 'Processing...' : `Pay ₹${bookingData.total_amount}`}
-                </button>
-            </div>
-        </form>
-    );
-};
 
 const BookingForm = () => {
     const [dateRange, setDateRange] = useState(null);
@@ -108,11 +29,7 @@ const BookingForm = () => {
 
     const isDateUnavailable = (date) => {
         const dateStr = format(date, 'yyyy-MM-dd');
-
-        // Check if blocked by admin
         if (calendarData.rules[dateStr]?.status === 'blocked') return true;
-
-        // Check if booked
         return calendarData.bookedRanges.some(range => {
             const start = new Date(range.start);
             const end = new Date(range.end);
@@ -134,8 +51,6 @@ const BookingForm = () => {
         let total = 0;
         let current = new Date(dateRange[0]);
         const end = new Date(dateRange[1]);
-
-        // Iterate through nights (start date inclusive, end date exclusive)
         while (current < end) {
             total += getPriceForDate(current);
             current.setDate(current.getDate() + 1);
@@ -146,26 +61,71 @@ const BookingForm = () => {
     const handleDetailsSubmit = (e) => {
         e.preventDefault();
         setError('');
-
         if (!dateRange || !dateRange[0] || !dateRange[1]) {
             setError('Please select check-in and check-out dates');
             return;
         }
-
         const checkIn = dateRange[0];
         const checkOut = dateRange[1];
         const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-
         if (nights < 1) {
             setError('Minimum stay is 1 night');
             return;
         }
-
         setStep('payment');
     };
 
-    const handlePaymentSuccess = async () => {
+    const handlePayment = async () => {
         setLoading(true);
+        setError('');
+        const totalAmount = calculateTotal();
+
+        try {
+            // 1. Create Order
+            const res = await fetch(`${API_URL}/api/create-payment-order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: totalAmount })
+            });
+            const order = await res.json();
+
+            if (!res.ok) throw new Error(order.error || 'Failed to create order');
+
+            // 2. Open Razorpay
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                amount: order.amount,
+                currency: order.currency,
+                name: "Krish Homestay",
+                description: "Booking Payment",
+                order_id: order.id,
+                handler: async function (response) {
+                    await handleBookingCreation(response);
+                },
+                prefill: {
+                    name: formData.guest_name,
+                    email: formData.email,
+                    contact: formData.phone
+                },
+                theme: {
+                    color: "#3399cc"
+                }
+            };
+
+            const rzp1 = new window.Razorpay(options);
+            rzp1.on('payment.failed', function (response) {
+                setError(response.error.description);
+                setLoading(false);
+            });
+            rzp1.open();
+
+        } catch (err) {
+            setError(err.message);
+            setLoading(false);
+        }
+    };
+
+    const handleBookingCreation = async (paymentResponse) => {
         const checkIn = dateRange[0];
         const checkOut = dateRange[1];
         const totalAmount = calculateTotal();
@@ -178,7 +138,10 @@ const BookingForm = () => {
                     ...formData,
                     check_in_date: format(checkIn, 'yyyy-MM-dd'),
                     check_out_date: format(checkOut, 'yyyy-MM-dd'),
-                    total_amount: totalAmount
+                    total_amount: totalAmount,
+                    payment_id: paymentResponse.razorpay_payment_id,
+                    order_id: paymentResponse.razorpay_order_id,
+                    signature: paymentResponse.razorpay_signature
                 })
             });
 
@@ -267,14 +230,18 @@ const BookingForm = () => {
                     </form>
                 </div>
             ) : (
-                <div className="payment-section">
-                    <Elements stripe={stripePromise}>
-                        <CheckoutForm
-                            bookingData={{ ...formData, total_amount: totalAmount }}
-                            onPaymentSuccess={handlePaymentSuccess}
-                            onCancel={() => setStep('details')}
-                        />
-                    </Elements>
+                <div className="payment-confirmation text-center">
+                    <h3>Confirm Payment</h3>
+                    <p className="mb-4">Total Amount: <strong>₹{totalAmount}</strong></p>
+
+                    {error && <div className="error-message mb-3">{error}</div>}
+
+                    <div className="d-flex justify-content-center gap-3">
+                        <button className="btn btn-secondary" onClick={() => setStep('details')}>Back</button>
+                        <button className="btn btn-primary" onClick={handlePayment} disabled={loading}>
+                            {loading ? 'Processing...' : 'Pay with Razorpay'}
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
