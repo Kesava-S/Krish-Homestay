@@ -60,16 +60,50 @@ router.post('/admin/rules', async (req, res) => {
 router.post('/create-payment-intent', async (req, res) => {
     const { amount } = req.body;
     try {
-        const paymentIntent = await createPaymentIntent(amount);
-        res.json({ clientSecret: paymentIntent.client_secret });
+        const order = await createPaymentIntent(amount);
+        res.json({ success: true, order });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
 
+router.post("/verify-payment", (req, res) => {
+    const crypto = require("crypto");
+
+    console.log("Request data in verify:...", req.body);   
+
+    const {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+    } = req.body;
+
+    const generatedSignature = crypto
+        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+        .update(razorpay_order_id + "|" + razorpay_payment_id)
+        .digest("hex");
+
+    if (generatedSignature === razorpay_signature) {
+        return res.json({
+            success: true,
+            message: "Payment verified"
+        });
+    } else {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid signature"
+        });
+    }
+});
+
+
 // Create booking
 router.post('/bookings', async (req, res) => {
     const { guest_name, email, phone, check_in_date, check_out_date, guests_count, total_amount } = req.body;
+
+    console.log("Booking data:", req.body);
+    
 
     if (!guest_name || !email || !check_in_date || !check_out_date) {
         return res.status(400).json({ error: 'Missing required fields' });
@@ -135,5 +169,20 @@ router.post('/bookings', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
+// router.get("/test-sheet", async (req, res) => {
+//     try {
+//         const result = await sheets.spreadsheets.values.get({
+//             spreadsheetId: "1IywqWahk1IgrDT3m2bgmybqDT55OlPi-EYAOS_FJBDE",
+//             range: "Bookings!A1"
+//         });
+
+//         res.json(result.data);
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ error: err.message });
+//     }
+// });
+
 
 module.exports = router;

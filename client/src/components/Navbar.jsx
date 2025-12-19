@@ -10,7 +10,7 @@ const Navbar = () => {
         <nav className="navbar glass-card">
             <div className="nav-container">
                 <Link to="/" className="logo">
-                    <img src="/logo.png" alt="Krish Homestay Logo" className="logo-img" />
+                    <img src="/assets/logo/logo.png" alt="Krish Homestay Logo" className="logo-img" />
                     Krish Homestay
                 </Link>
 

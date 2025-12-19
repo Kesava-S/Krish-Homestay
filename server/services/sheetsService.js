@@ -63,6 +63,7 @@ async function addBooking(booking) {
             spreadsheetId: SPREADSHEET_ID,
             range: 'Bookings!A:I',
             valueInputOption: 'USER_ENTERED',
+            insertDataOption: 'INSERT_ROWS',
             resource: { values },
         });
 

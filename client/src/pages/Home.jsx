@@ -49,7 +49,7 @@ const Home = () => {
         <div className="home">
             {/* Hero Section */}
             <section className="hero" style={{
-                backgroundImage: 'linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(/assets/hero.png)',
+                backgroundImage: 'linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(/assets/cover_photo/1.png)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 height: '100vh',
@@ -85,21 +85,43 @@ const Home = () => {
             <section id="about" className="section container">
                 <div className="grid-3" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', alignItems: 'center' }}>
                     <div>
-                        <h2>About Our Homestay</h2>
+                        <h1>About Our Homestay</h1>
                         <p className="mt-4">
-                            Stay in a traditional Kerala home where tranquility and cleanliness come first. With soothing mountain views and a naturally calm atmosphere, it’s the perfect retreat for travellers seeking an immersive, genuine Munnar experience.
+                            Stay in a traditional Kerala home where tranquility and cleanliness come first.
+                            With soothing mountain views and a naturally calm atmosphere, it’s the perfect
+                            retreat for travellers seeking an immersive, genuine Munnar experience.
                         </p>
+
                         <p className="mt-4">
-                            We offer a 3BHK private rental home with a caretaker, ensuring you have privacy and comfort.
+                            We offer a 3BHK private rental home with a caretaker, ensuring you have privacy
+                            and comfort.
                         </p>
-                        <div className="mt-4" style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+
+                        <div
+                            className="mt-4"
+                            style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center' }}
+                        >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <MapPin color="var(--primary)" /> Munnar
+                                <MapPin color="var(--primary)" />
+                                <span>Munnar</span>
                             </div>
-                            <a href="https://maps.app.goo.gl/hPvtGG5KCE4GGYf2A" target="_blank" rel="noreferrer" className="btn btn-primary" style={{ padding: '8px 20px', fontSize: '0.9rem' }}>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                <span><strong>Check-in:</strong> 01:00 PM - 03.00 PM</span>
+                                <span><strong>Check-out:</strong> 10:00 AM - 11.00 AM</span>
+                            </div>
+
+                            <a
+                                href="https://maps.app.goo.gl/hPvtGG5KCE4GGYf2A"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="btn btn-primary"
+                                style={{ padding: '8px 20px', fontSize: '0.9rem' }}
+                            >
                                 View on Google Maps
                             </a>
                         </div>
+
                     </div>
                     <div>
                         <img src="/assets/about_image.jpg" alt="About Krish Homestay" style={{ width: '100%', borderRadius: '20px', boxShadow: 'var(--shadow)' }} />
@@ -110,7 +132,7 @@ const Home = () => {
             {/* Amenities */}
             <section id="amenities" className="section" style={{ background: 'white' }}>
                 <div className="container">
-                    <h2 className="text-center mb-4">Amenities</h2>
+                    <h1 className="text-center mb-4">Amenities</h1>
                     <div className="grid-3">
                         <div className="glass-card text-center">
                             <Wifi size={40} color="var(--primary)" />
@@ -148,7 +170,7 @@ const Home = () => {
                         <img src="/assets/cozy_room_new.jpg" alt="Room" style={{ width: '100%', borderRadius: '20px', boxShadow: 'var(--shadow)' }} />
                     </div>
                     <div>
-                        <h2>Cozy Rooms</h2>
+                        <h1>Cozy Rooms</h1>
                         <p className="mt-4">
                             Our 3BHK home features spotlessly clean rooms with comfortable beds, fresh linens, and attached bathrooms with 24/7 hot water.
                         </p>
@@ -166,20 +188,27 @@ const Home = () => {
             {/* Gallery Section */}
             <section id="gallery" className="section" style={{ background: 'white' }}>
                 <div className="container">
-                    <h2 className="text-center mb-4">Gallery</h2>
-                    <p className="text-center mb-5">Explore our beautiful property and surroundings.</p>
-
+                    <h1 className="text-center">Gallery</h1>
+                    <p className="text-center">Explore our beautiful property and surroundings.</p>
+                    <br />
                     <div className="gallery-grid" style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
                         gap: '20px'
                     }}>
                         {/* Images */}
-                        <img src="/assets/gallery_1.jpg" alt="Living Area" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px', transition: 'transform 0.3s' }} className="gallery-item" />
-                        <img src="/assets/gallery_2.jpg" alt="Balcony View" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
-                        <img src="/assets/gallery_3.jpg" alt="Balcony Seating" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
-                        <img src="/assets/gallery_4.jpg" alt="Parking & Entrance" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
-                        <img src="/assets/gallery_5.jpg" alt="Outdoor Dining" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
+                        <img src="/assets/gallery/gallery_1.jpg" alt="Living Area" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px', transition: 'transform 0.3s' }} className="gallery-item" />
+                        <img src="/assets/gallery/gallery_2.jpg" alt="Balcony View" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
+                        <img src="/assets/gallery/gallery_3.jpg" alt="Balcony Seating" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
+                        <img src="/assets/gallery/gallery_4.jpg" alt="Parking & Entrance" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
+                        <img src="/assets/gallery/gallery_5.jpg" alt="Outdoor Dining" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
+                        <img src="/assets/gallery/gallery_6.jpg" alt="Outdoor area" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
+                        <img src="/assets/gallery/gallery_7.jpg" alt="Outdoor veranda" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
+                        <img src="/assets/gallery/gallery_8.jpg" alt="Living room" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
+                        <img src="/assets/gallery/gallery_9.jpg" alt="Air comditioning room" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
+                        <img src="/assets/gallery/gallery_10.jpg" alt="clean restroom" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
+                        <img src="/assets/gallery/gallery_11.png" alt="home outside view" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
+                        <img src="/assets/gallery/gallery_12.png" alt="outside view" style={{ width: '100%', height: '450px', objectFit: 'cover', borderRadius: '10px' }} className="gallery-item" />
 
                         {/* Video 1 */}
                         <div style={{ position: 'relative', height: '450px', borderRadius: '10px', overflow: 'hidden', background: '#000' }}>
