@@ -3,7 +3,7 @@ const router = express.Router();
 const { getBookings, addBooking, getCalendarRules, updateCalendarRules } = require('../services/sheetsService');
 const { createCalendarEvent } = require('../services/calendarService');
 const { sendConfirmationEmail } = require('../services/emailService');
-const { createPaymentIntent } = require('../services/paymentService');
+const { createOrder } = require('../services/paymentService');
 
 // Admin Login
 router.post('/admin/login', (req, res) => {
@@ -56,8 +56,8 @@ router.post('/admin/rules', async (req, res) => {
     }
 });
 
-// Create Payment Intent
-router.post('/create-payment-intent', async (req, res) => {
+// Create Payment Order (Razorpay)
+router.post('/create-payment-order', async (req, res) => {
     const { amount } = req.body;
     try {
         const order = await createPaymentIntent(amount);
@@ -140,6 +140,20 @@ router.post('/bookings', async (req, res) => {
 
         if (hasBookingOverlap || hasBlockOverlap) {
             return res.status(409).json({ error: 'Dates not available' });
+        }
+
+        // Check for maximum 15 bookings per month
+        const checkInMonth = newStart.getMonth();
+        const checkInYear = newStart.getFullYear();
+
+        const bookingsInMonth = bookings.filter(b => {
+            if (b.status !== 'confirmed') return false;
+            const bDate = new Date(b.check_in_date);
+            return bDate.getMonth() === checkInMonth && bDate.getFullYear() === checkInYear;
+        });
+
+        if (bookingsInMonth.length >= 15) {
+            return res.status(409).json({ error: 'Booking limit reached for this month. Please contact us directly.' });
         }
 
         // Add to Google Sheet

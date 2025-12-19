@@ -122,7 +122,6 @@ const CheckoutForm = ({ bookingData, onPaymentSuccess, onCancel }) => {
 };
 
 
-
 const BookingForm = () => {
     const [dateRange, setDateRange] = useState(null);
     const [calendarData, setCalendarData] = useState({ bookedRanges: [], rules: {} });
@@ -152,11 +151,7 @@ const BookingForm = () => {
 
     const isDateUnavailable = (date) => {
         const dateStr = format(date, 'yyyy-MM-dd');
-
-        // Check if blocked by admin
         if (calendarData.rules[dateStr]?.status === 'blocked') return true;
-
-        // Check if booked
         return calendarData.bookedRanges.some(range => {
             const start = new Date(range.start);
             const end = new Date(range.end);
@@ -178,8 +173,6 @@ const BookingForm = () => {
         let total = 0;
         let current = new Date(dateRange[0]);
         const end = new Date(dateRange[1]);
-
-        // Iterate through nights (start date inclusive, end date exclusive)
         while (current < end) {
             total += getPriceForDate(current);
             current.setDate(current.getDate() + 1);
@@ -215,17 +208,14 @@ const BookingForm = () => {
             setError('Please select check-in and check-out dates');
             return;
         }
-
         const checkIn = dateRange[0];
         const checkOut = dateRange[1];
 
         const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-
         if (nights < 1) {
             setError('Minimum stay is 1 night');
             return;
         }
-
         setStep('payment');
     };
 
