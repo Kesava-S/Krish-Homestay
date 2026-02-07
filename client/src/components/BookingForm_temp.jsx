@@ -160,6 +160,10 @@ const BookingForm = () => {
     const isDateUnavailable = (date) => {
         const dateStr = format(date, 'yyyy-MM-dd');
         if (calendarData.rules[dateStr]?.status === 'blocked') return true;
+
+        console.log(calendarData.bookedRanges);
+
+
         return calendarData.bookedRanges.some(range => {
             const start = new Date(range.start);
             const end = new Date(range.end);
@@ -194,22 +198,11 @@ const BookingForm = () => {
 
 
     const generateBookingId = () => {
-        if (!dateRange || !dateRange[0]) return "KH-INVALID";
-
-        // Format booking date (YYYYMMDD)
-        const d = new Date(dateRange[0]);
-        const yyyyMMdd = d.toISOString().slice(0, 10).replace(/-/g, '');
-
-        // Unique suffix: timestamp + random
-        const unique = (Date.now().toString(36) + Math.random().toString(36).substr(2, 4)).toUpperCase();
-
-        // Short unique part
-        const shortSuffix = unique.slice(-5);
-
-        // Final Booking ID: KH-YYYYMMDD-XXXXX
-        return `KH-${yyyyMMdd}-${shortSuffix}`;
+        const date = new Date();
+        const yyyyMMdd = date.toISOString().slice(0, 10).replace(/-/g, '');
+        const random = Math.floor(1000 + Math.random() * 9000);
+        return `KH-${yyyyMMdd}-${random}`;
     };
-
 
     const handleDetailsSubmit = async (e) => {
         e.preventDefault();
@@ -244,29 +237,39 @@ const BookingForm = () => {
             return;
         }
 
-        // ✅ Generate booking ID
-        const newBookingId = generateBookingId();
-        setBookingId(newBookingId);
+        const newBookingId = generateBookingId()
 
-        // 🔔 Call enquiry webhook (non-blocking)
-        fetch(`${import.meta.env.VITE_N8N_URL}/registeration`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                booking_id: newBookingId,
-                ...formData,
-                check_in_date: format(checkIn, 'yyyy-MM-dd'),
-                check_out_date: format(checkOut, 'yyyy-MM-dd'),
-                source: 'website',
-                timestamp: new Date().toISOString(),
-                payment: { status: 'enquiry' }
-            })
-        }).catch(err => console.error('Enquiry webhook failed', err));
+        try {
+            const res = await fetch(`${import.meta.env.VITE_N8N_URL}/booking`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    booking_id: newBookingId,
+                    guest_name: formData.guest_name,
+                    email: formData.email,
+                    phone: formData.phone,
+                    check_in_date: checkIn.toISOString().split('T')[0],
+                    check_out_date: checkOut.toISOString().split('T')[0],
+                    guests_count: formData.guests_count,
+                    payment: {
+                        status: 'pending'
+                    },
+                    payment_id: null
+                })
+            });
 
-        // 👉 Move to payment step
-        setStep('payment');
+            if (!res.ok) throw new Error('Failed to save booking');
+
+            const data = await res.json();
+
+            // store booking id for later payment update
+            setBookingId(newBookingId);
+
+            setStep('payment');
+        } catch (err) {
+            setError('Unable to proceed. Please try again.');
+        }
     };
-
 
     const handlePaymentSuccess = async (status, paymentDetails = {}) => {
         const checkIn = dateRange[0];
@@ -286,7 +289,7 @@ const BookingForm = () => {
         const webhookPayload = {
             booking: bookingPayload,
             payment: {
-                status: status === 'verified' ? 'booked' : 'failed',
+                status: status === 'verified' ? 'confirmed' : 'failed',
                 booking_id: bookingId,
                 payment_id: paymentDetails?.razorpay_payment_id || null,
                 order_id: paymentDetails?.razorpay_order_id || null,
@@ -315,8 +318,6 @@ const BookingForm = () => {
                 return;
             }
 
-            generateReceiptAndNotify(webhookPayload);
-
             // ✅ Payment verified
             setPaymentStatus('success');
             setStep('success');
@@ -328,39 +329,6 @@ const BookingForm = () => {
             setLoading(false);
         }
     };
-
-    const generateReceiptAndNotify = async (webhookPayload) => {
-        try {
-            // 1️⃣ Call Node API to generate PDF
-            const receiptRes = await fetch(`${import.meta.env.VITE_API_URL}/api/generate-receipt`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(webhookPayload),
-            });
-
-            const receiptData = await receiptRes.json();
-            // example: { success: true, pdfUrl: "http://..." }
-
-            console.log("------Receipt data:" + receiptData);
-
-
-            // 2️⃣ Send result to n8n webhook
-            await fetch(`${import.meta.env.VITE_N8N_URL}/receipt-ready`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...webhookPayload,
-                    receipt: receiptData,   // attach pdf info
-                }),
-            });
-
-            console.log('Receipt sent to n8n');
-
-        } catch (err) {
-            console.error('Receipt flow failed', err);
-        }
-    };
-
 
     if (step === 'success') {
         return (
@@ -441,7 +409,6 @@ const BookingForm = () => {
                             <button type="submit" className="btn btn-primary" style={{ width: '100%', fontSize: '1.1rem' }}>
                                 Proceed to Payment
                             </button>
-
                         </form>
                     </div>
                 ) : (

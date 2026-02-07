@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import API_URL from '../config';
+import { authContext } from '../App';
 
 const AdminDashboard = () => {
+
+    const { token, setToken } = useContext(authContext);
+
     const [dateRange, setDateRange] = useState(null);
     const [calendarData, setCalendarData] = useState({ bookedRanges: [], rules: {} });
     const [price, setPrice] = useState(7000);
@@ -103,12 +107,18 @@ const AdminDashboard = () => {
         return <div style={{ fontSize: '10px', color: '#888' }}>₹7000</div>;
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('adminToken');
+        setToken(null);
+        navigate('/admin')
+    }
+
     return (
-        <div className="container section">
+        <div className="container">
             <div className="glass-card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                     <h2>Admin Dashboard</h2>
-                    <button onClick={() => { localStorage.removeItem('adminToken'); navigate('/admin'); }} className="btn btn-secondary">Logout</button>
+                    <button onClick={handleLogout} className="btn btn-secondary">Logout</button>
                 </div>
 
                 <div className="grid-2" style={{ gridTemplateColumns: '1fr 1fr', gap: '40px' }}>

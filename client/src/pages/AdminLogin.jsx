@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_URL from '../config';
+import { authContext } from '../App';
 
 const AdminLogin = () => {
+
+    const {token, setToken} = useContext(authContext);
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -23,7 +27,8 @@ const AdminLogin = () => {
 
             if (data.success) {
                 localStorage.setItem('adminToken', data.token);
-                navigate('/admin/dashboard');
+                setToken(data.token);
+                navigate('/adminpanel');
             } else {
                 setError(data.error || 'Login failed');
             }

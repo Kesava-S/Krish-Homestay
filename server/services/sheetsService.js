@@ -22,7 +22,7 @@ async function getBookings() {
     try {
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'Bookings!A:I',
+            range: 'Bookings!A:K',
         });
 
         const rows = response.data.values;
@@ -30,14 +30,15 @@ async function getBookings() {
 
         return rows.slice(1).map(row => ({
             id: row[0],
-            guest_name: row[1],
-            email: row[2],
-            phone: row[3],
-            check_in_date: row[4],
-            check_out_date: row[5],
-            guests_count: parseInt(row[6]),
-            status: row[7],
-            total_amount: row[8]
+            date: row[1],
+            guest_name: row[2],
+            email: row[3],
+            phone: row[4],
+            check_in_date: row[5],
+            check_out_date: row[6],
+            guests_count: parseInt(row[7]),
+            status: row[8],
+            total_amount: row[9]
         }));
     } catch (error) {
         console.error('Error fetching bookings:', error);
@@ -61,7 +62,7 @@ async function addBooking(booking) {
 
         await sheets.spreadsheets.values.append({
             spreadsheetId: SPREADSHEET_ID,
-            range: 'Bookings!A:I',
+            range: 'Bookings!A:K',
             valueInputOption: 'USER_ENTERED',
             insertDataOption: 'INSERT_ROWS',
             resource: { values },
