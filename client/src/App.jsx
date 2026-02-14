@@ -24,6 +24,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/book" element={<div className="section container" style={{ marginTop: '80px' }}><BookingForm /></div>} />
+          <Route path="/booking-confirm/:booking_id" element={<div className="section container" style={{ marginTop: '80px' }}><BookingForm /></div>} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/adminpanel" element={<AdminPanel />} />
           <Route path="/admin/dashboard" element={<div className="section container" style={{ marginTop: '80px' }}><AdminDashboard /></div>} />

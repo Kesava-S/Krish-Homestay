@@ -4,6 +4,7 @@ import 'react-calendar/dist/Calendar.css';
 import { format } from 'date-fns';
 import API_URL from '../config';
 import './BookingForm.css';
+import { useParams } from 'react-router-dom';
 
 const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -146,16 +147,56 @@ const BookingForm = () => {
 
     const [confirmBookingId, setBookingId] = useState('');
 
+    const bookingId = useParams('booking_id');    
+
     useEffect(() => {
         fetch(`${API_URL}/api/calendar-data`)
             .then(res => res.json())
             .then(data => {
-                console.log("---calendar", data);
-
                 setCalendarData(data);
             })
             .catch(err => console.error(err));
     }, []);
+
+    useEffect(() => {
+        if (!bookingId) return;
+
+        const fetchBooking = async () => {
+            try {
+                const res = await fetch(
+                    `${import.meta.env.VITE_N8N_URL}/wh-enquiry?booking_id=${bookingId.booking_id}`
+                );
+
+                const data = await res.json();                
+
+                if (!data) return;
+
+                // populate form
+                setFormData({
+                    guest_name: data.guest_name || '',
+                    email: data.email || '',
+                    phone: data.phone_number || '',
+                    guests_count: data.guests_count || 6,
+                });
+
+                // set calendar range
+                if (data.check_in_date && data.check_out_date) {
+                    setDateRange([
+                        new Date(data.check_in_date),
+                        new Date(data.check_out_date)
+                    ]);
+                }
+
+                setBookingId(data.booking_id);
+
+            } catch (err) {
+                console.error("Failed to load booking", err);
+            }
+        };
+
+        fetchBooking();
+    }, [bookingId]);
+
 
     const isDateUnavailable = (date) => {
         const dateStr = format(date, 'yyyy-MM-dd');
@@ -432,7 +473,7 @@ const BookingForm = () => {
                             <div className="form-group">
                                 <label>Guests</label>
                                 <select value={formData.guests_count} onChange={e => setFormData({ ...formData, guests_count: parseInt(e.target.value) })}>
-                                    {[6, 7, 8, 9, 10, 11, 12].map(n => <option key={n} value={n}>{n} Guests</option>)}
+                                    {[6, 7, 8, 9, 10, 11, 12, 13].map(n => <option key={n} value={n}>{n} Guests</option>)}
                                 </select>
                             </div>
 
