@@ -12,6 +12,7 @@ require('dotenv').config();
 // 2. Share your main calendar (krishhomestays@gmail.com) with the Service Account email.
 // 3. Use the Service Account to insert events.
 
+
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
 const calendar = google.calendar({ version: 'v3' });
