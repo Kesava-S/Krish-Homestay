@@ -68,7 +68,7 @@ const Home = () => {
                     </p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center' }}>
                         <Link to="/book" className="btn btn-primary" style={{ fontSize: '1.2rem', padding: '15px 40px' }}>Book Your Stay</Link>
-                        <a href="https://wa.me/917305395094" target="_blank" rel="noreferrer" className="btn btn-primary" style={{
+                        <a href="https://wa.me/918807200931" target="_blank" rel="noreferrer" className="btn btn-primary" style={{
                             fontSize: '1.2rem',
                             padding: '15px 40px',
                             display: 'flex',
