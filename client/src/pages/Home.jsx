@@ -177,12 +177,12 @@ const Home = () => {
                 <h1 className="text-center mb-5">Nearby Attractions</h1><br/>
                 <div className="grid-3">
                     <div className="glass-card">
-                        <img src="/assets/gallery_2.jpg" alt="Pothamedu Viewpoint" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '15px' }} />
+                        <img src="/assets/gallery/Pothamedu Viewpoint.jpg" alt="Pothamedu Viewpoint" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '15px' }} />
                         <h3>Pothamedu Viewpoint</h3>
                         <p className="mt-2">Offers sweeping views of tea, coffee and cardamom plantations. Very photogenic around sunrise/sunset.</p>
                     </div>
                     <div className="glass-card">
-                        <img src="/assets/gallery_5.jpg" alt="Echo Point" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '15px' }} />
+                        <img src="/assets/gallery/Echo Point Munnar.jpg" alt="Echo Point" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '15px' }} />
                         <h3>Echo Point Munnar</h3>
                         <p className="mt-2">Known for the natural echo phenomenon amid the hills and lake-side atmosphere. Great for a fun outing.</p>
                     </div>
@@ -197,7 +197,7 @@ const Home = () => {
                         <p className="mt-2">A cultural-educational experience showing the history of the region’s tea industry.</p>
                     </div>
                     <div className="glass-card">
-                        <img src="/assets/gallery_3.jpg" alt="Sengulam Dam" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '15px' }} />
+                        <img src="/assets/gallery/Sengulam Dam.jpg" alt="Sengulam Dam" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '15px' }} />
                         <h3>Sengulam Dam</h3>
                         <p className="mt-2">A lesser-known, quiet spot for boating and relaxation. Ideal for escaping the crowds.</p>
                     </div>
