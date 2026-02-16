@@ -8,12 +8,11 @@ const { createPaymentIntent } = require('../services/paymentService');
 // Admin Login
 router.post('/admin/login', (req, res) => {
   const { username, password } = req.body;
-  // if (username === 'Kesavaram Sundararaj' && password === 'Sundararaj@786') {
-  if (username === 'admin' && password === 'admin@123') {
+  if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
     res.json({ success: true, token: 'admin-session-token' });
   } else {
     res.status(401).json({ error: 'Invalid credentials' });
-  }
+  } 
 });
 
 // Get Calendar Data (Bookings + Rules)
