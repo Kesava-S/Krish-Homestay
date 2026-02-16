@@ -2,7 +2,8 @@ const { google } = require('googleapis');
 require('dotenv').config(); // Load env from current dir
 
 const auth = new google.auth.GoogleAuth({
-    keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    // keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
