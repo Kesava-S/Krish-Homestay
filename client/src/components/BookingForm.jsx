@@ -163,11 +163,9 @@ const BookingForm = () => {
 
         const fetchBooking = async () => {
             try {
-                const res = await fetch(
+                const data = await fetch(
                     `${import.meta.env.VITE_N8N_URL}/wh-enquiry?booking_id=${bookingId.booking_id}`
-                );
-
-                const data = await res.json();                
+                );            
 
                 if (!data) return;
 

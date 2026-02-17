@@ -20,9 +20,6 @@ router.get('/calendar-data', async (req, res) => {
   try {
     const [bookings, rules] = await Promise.all([getBookings(), getCalendarRules()]);
 
-    console.log("---", bookings);
-
-
     // Process Bookings
     const bookedDates = bookings
       .filter(b => b.status === 'booked')

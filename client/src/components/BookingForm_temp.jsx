@@ -150,8 +150,6 @@ const BookingForm = () => {
         fetch(`${API_URL}/api/calendar-data`)
             .then(res => res.json())
             .then(data => {
-                console.log("---calendar", data);
-
                 setCalendarData(data);
             })
             .catch(err => console.error(err));
