@@ -407,7 +407,7 @@ const BookingForm = () => {
                 <h2 style={{ color: 'var(--primary)', marginBottom: '20px' }}>Booking Confirmed!</h2>
                 <p>Thank you, {formData.guest_name}.</p>
                 <p>We have sent a confirmation to <strong>{formData.email}</strong>.</p>
-                <button className="btn btn-primary mt-4" onClick={() => window.location.reload()}>Book Another Stay</button>
+                <button className="btn btn-primary mt-4" onClick={() => window.location.href('/book')}>Book Another Stay</button>
             </div>
         );
     }

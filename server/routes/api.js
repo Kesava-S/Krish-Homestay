@@ -180,40 +180,23 @@ router.post('/generate-receipt', async (req, res) => {
   try {
     const { booking, payment } = req.body;
 
-    if (!booking) {
-      return res.status(400).json({ success: false, message: 'Booking data missing' });
-    }
-
     const html = generateReceiptHTML(booking, payment || {});
 
-    const file = { content: html };
+    const pdfBuffer = await htmlToPdf.generatePdf(
+      { content: html },
+      { format: 'A4', printBackground: true }
+    );
 
-    const pdfBuffer = await htmlToPdf.generatePdf(file, {
-      format: 'A4',
-      printBackground: true,
-    });
-
-    // 🔹 File name & path
-    const fileName = `receipt_${booking.booking_id}.pdf`;
-    const filePath = path.join(__dirname, 'receipts', fileName);
-
-    // 🔹 Save to local disk
-    fs.writeFileSync(filePath, pdfBuffer);
-
-    // 🔹 Public URL
-    const publicUrl = `${req.protocol}://${req.get('host')}/receipts/${fileName}`;
-
-    // 🔹 Return JSON (not PDF)
     res.json({
       success: true,
       booking_id: booking.booking_id,
-      pdf_path: filePath,      // local path (for logs)
-      pdf_url: publicUrl      // use this in n8n / email
+      fileName: `receipt_${booking.booking_id}.pdf`,
+      pdfBase64: pdfBuffer.toString('base64')
     });
 
   } catch (err) {
-    console.error('PDF generation failed:', err);
-    res.status(500).json({ success: false, message: 'Failed to generate receipt' });
+    console.error(err);
+    res.status(500).json({ success: false });
   }
 });
 
