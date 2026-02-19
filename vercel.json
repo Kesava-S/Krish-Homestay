@@ -13,14 +13,30 @@
       }
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/:path*",
-      "destination": "/server/index.js"
+      "src": "/api/(.*)",
+      "dest": "/server/index.js"
     },
     {
-      "source": "/:path*",
-      "destination": "/client/dist/index.html"
+      "src": "^/assets/(.*)",
+      "dest": "/client/dist/assets/$1"
+    },
+    {
+      "src": "^/favicon\\.ico",
+      "dest": "/client/dist/favicon.ico"
+    },
+    {
+      "src": "/(.*)\\.js",
+      "dest": "/client/dist/$1.js"
+    },
+    {
+      "src": "/(.*)\\.css",
+      "dest": "/client/dist/$1.css"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/dist/index.html"
     }
   ]
 }
