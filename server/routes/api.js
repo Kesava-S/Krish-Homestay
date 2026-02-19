@@ -5,6 +5,8 @@ const { createCalendarEvent } = require('../services/calendarService');
 const { sendConfirmationEmail } = require('../services/emailService');
 const { createPaymentIntent } = require('../services/paymentService');
 
+const { fetchAirbnbBookings } = require('../services/fetchAirbnbBookings')
+
 // Admin Login
 router.post('/admin/login', (req, res) => {
   const { username, password } = req.body;
@@ -12,24 +14,62 @@ router.post('/admin/login', (req, res) => {
     res.json({ success: true, token: 'admin-session-token' });
   } else {
     res.status(401).json({ error: 'Invalid credentials' });
-  } 
+  }
 });
 
 // Get Calendar Data (Bookings + Rules)
+// router.get('/calendar-data', async (req, res) => {
+//   try {
+//     const [bookings, rules] = await Promise.all([getBookings(), getCalendarRules()]);
+
+//     // Process Bookings
+//     const bookedDates = bookings
+//       .filter(b => b.status === 'booked')
+//       .map(b => ({
+//         start: b.check_in_date,
+//         end: b.check_out_date,
+//         type: 'booked'
+//       }));
+
+//     // Process Rules (Price & Blocks)
+//     const ruleData = rules.reduce((acc, rule) => {
+//       acc[rule.date] = {
+//         price: rule.price,
+//         status: rule.status
+//       };
+//       return acc;
+//     }, {});
+
+//     res.json({ bookedRanges: bookedDates, rules: ruleData });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
 router.get('/calendar-data', async (req, res) => {
   try {
-    const [bookings, rules] = await Promise.all([getBookings(), getCalendarRules()]);
+    const [bookings, rules, airbnb] = await Promise.all([
+      getBookings(),
+      getCalendarRules(),
+      fetchAirbnbBookings()
+    ]);
 
-    // Process Bookings
-    const bookedDates = bookings
+    console.log("airbnb----", airbnb);
+
+    const websiteBookings = bookings
       .filter(b => b.status === 'booked')
       .map(b => ({
         start: b.check_in_date,
         end: b.check_out_date,
-        type: 'booked'
+        type: 'website'
       }));
 
-    // Process Rules (Price & Blocks)
+    const allBookedDates = [
+      ...websiteBookings,
+      ...airbnb
+    ];
+
     const ruleData = rules.reduce((acc, rule) => {
       acc[rule.date] = {
         price: rule.price,
@@ -38,12 +78,18 @@ router.get('/calendar-data', async (req, res) => {
       return acc;
     }, {});
 
-    res.json({ bookedRanges: bookedDates, rules: ruleData });
+    res.json({
+      bookedRanges: allBookedDates,
+      rules: ruleData
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+
 
 // Update Calendar Rules (Admin)
 router.post('/admin/rules', async (req, res) => {
