@@ -147,7 +147,7 @@ const BookingForm = () => {
 
     const [confirmBookingId, setBookingId] = useState('');
 
-    const bookingId = useParams('booking_id');    
+    const { booking_id } = useParams();
 
     useEffect(() => {
         fetch(`${API_URL}/api/calendar-data`)
@@ -159,33 +159,35 @@ const BookingForm = () => {
     }, []);
 
     useEffect(() => {
-        if (!bookingId) return;
+        if (!booking_id) return;
 
         const fetchBooking = async () => {
             try {
-                const data = await fetch(
-                    `${import.meta.env.VITE_N8N_URL}/wh-enquiry?booking_id=${bookingId.booking_id}`
-                );            
+                const response = await fetch(
+                    `${import.meta.env.VITE_N8N_URL}/booking-enquiry?booking_id=${booking_id}`
+                );
 
-                if (!data) return;
+                const raw = await response.json();
+                const data = Array.isArray(raw) ? raw[0] : raw;
+                if (!data || !data['Booking_id']) return;
 
                 // populate form
                 setFormData({
-                    guest_name: data.guest_name || '',
-                    email: data.email || '',
-                    phone: data.phone_number || '',
-                    guests_count: data.guests_count || 6,
+                    guest_name: data['Guest Name'] || '',
+                    email: data['Email'] || '',
+                    phone: data['Phone Number'] || '',
+                    guests_count: data['Guest Count'] || 6,
                 });
 
                 // set calendar range
-                if (data.check_in_date && data.check_out_date) {
+                if (data['Check In Date'] && data['Check Out Date']) {
                     setDateRange([
-                        new Date(data.check_in_date),
-                        new Date(data.check_out_date)
+                        new Date(data['Check In Date']),
+                        new Date(data['Check Out Date'])
                     ]);
                 }
 
-                setBookingId(data.booking_id);
+                setBookingId(data['Booking_id']);
 
             } catch (err) {
                 console.error("Failed to load booking", err);
@@ -193,7 +195,7 @@ const BookingForm = () => {
         };
 
         fetchBooking();
-    }, [bookingId]);
+    }, [booking_id]);
 
 
     const isDateUnavailable = (date) => {
@@ -284,23 +286,28 @@ const BookingForm = () => {
         }
 
         // ✅ Generate booking ID
-        const newBookingId = generateBookingId();
-        setBookingId(newBookingId);
+        // const newBookingId = generateBookingId();
+        // setBookingId(newBookingId);
 
-        // 🔔 Call enquiry webhook (non-blocking)
-        fetch(`${import.meta.env.VITE_N8N_URL}/registeration`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                booking_id: newBookingId,
-                ...formData,
-                check_in_date: format(checkIn, 'yyyy-MM-dd'),
-                check_out_date: format(checkOut, 'yyyy-MM-dd'),
-                source: 'website',
-                timestamp: new Date().toISOString(),
-                payment: { status: 'enquiry' }
-            })
-        }).catch(err => console.error('Enquiry webhook failed', err));
+        const newBookingId = confirmBookingId || generateBookingId();
+        if (!confirmBookingId) setBookingId(newBookingId);
+
+        if (!booking_id) {
+            // 🔔 Call enquiry webhook (non-blocking)
+            fetch(`${import.meta.env.VITE_N8N_URL}/registeration`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    booking_id: newBookingId,
+                    ...formData,
+                    check_in_date: format(checkIn, 'yyyy-MM-dd'),
+                    check_out_date: format(checkOut, 'yyyy-MM-dd'),
+                    source: 'website',
+                    timestamp: new Date().toISOString(),
+                    payment: { status: 'enquiry' }                    
+                })
+            }).catch(err => console.error('Enquiry webhook failed', err));
+        }
 
         // 👉 Move to payment step
         setStep('payment');
@@ -407,7 +414,7 @@ const BookingForm = () => {
                 <h2 style={{ color: 'var(--primary)', marginBottom: '20px' }}>Booking Confirmed!</h2>
                 <p>Thank you, {formData.guest_name}.</p>
                 <p>We have sent a confirmation to <strong>{formData.email}</strong>.</p>
-                <button className="btn btn-primary mt-4" onClick={() => window.location.href('/book')}>Book Another Stay</button>
+                <button className="btn btn-primary mt-4" onClick={() => window.location.href = '/book'}>Book Another Stay</button>
             </div>
         );
     }
@@ -471,7 +478,7 @@ const BookingForm = () => {
                             <div className="form-group">
                                 <label>Guests</label>
                                 <select value={formData.guests_count} onChange={e => setFormData({ ...formData, guests_count: parseInt(e.target.value) })}>
-                                    {[6, 7, 8, 9, 10, 11, 12, 13].map(n => <option key={n} value={n}>{n} Guests</option>)}
+                                    {[6, 7, 8, 9, 10].map(n => <option key={n} value={n}>{n} Guests</option>)}
                                 </select>
                             </div>
 
