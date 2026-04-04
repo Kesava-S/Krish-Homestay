@@ -289,9 +289,9 @@ const Home = () => {
                     </div>
                     <div>
                         <h3 style={{ color: 'white' }}>Contact Us</h3>
-                        <p className="mt-4">Phone: +91 73053 95094</p>
+                        <p className="mt-4">Phone: +91 88072 00931</p>
                         <p>Email: krishhomestays@gmail.com</p>
-                        <a href="https://wa.me/917305395094" target="_blank" rel="noreferrer" className="btn btn-primary mt-4" style={{ backgroundColor: '#25D366', border: 'none' }}>
+                        <a href="https://wa.me/918807200931" target="_blank" rel="noreferrer" className="btn btn-primary mt-4" style={{ backgroundColor: '#25D366', border: 'none' }}>
                             Chat on WhatsApp
                         </a>
                         <a href="https://www.instagram.com/krish_homestay_munnar?igsh=Y200NDRvbHE1MmZv" target="_blank" rel="noreferrer" className="btn mt-4" style={{ background: '#E1306C', color: 'white', display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'center', marginLeft: '0' }}>

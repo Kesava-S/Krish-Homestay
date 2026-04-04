@@ -73,7 +73,7 @@ async function sendConfirmationEmail(bookingDetails) {
 
         <!-- CTA -->
         <div style="text-align: center; margin: 25px 0;">
-            <a href="tel:+917305395094"
+            <a href="tel:+918807200931"
                 style="background-color: #2c7be5; color: #ffffff; text-decoration: none; padding: 12px 20px; border-radius: 4px; font-size: 14px; display: inline-block;">
                 📞 Contact Us
             </a>
