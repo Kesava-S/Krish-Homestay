@@ -64,7 +64,7 @@ const Home = () => {
                 <div className="hero-content" style={{ zIndex: 2 }}>
                     <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 5rem)', marginBottom: '20px', color: 'white', textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>Krish Homestay</h1>
                     <p style={{ fontSize: 'clamp(1rem, 2vw, 1.5rem)', marginBottom: '30px', maxWidth: '800px', margin: '0 auto 30px', textShadow: '0 1px 5px rgba(0,0,0,0.3)' }}>
-                        Stay in a traditional Kerala home where tranquility and cleanliness come first.
+                        Experience the finest <strong>Homestays in Munnar</strong>. Stay in a traditional Kerala home where tranquility and cleanliness come first.
                     </p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center' }}>
                         <Link to="/book" className="btn btn-primary" style={{ fontSize: '1.2rem', padding: '15px 40px' }}>Book Your Stay</Link>
@@ -86,9 +86,9 @@ const Home = () => {
             <section id="about" className="section container">
                 <div className="grid-3" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', alignItems: 'center' }}>
                     <div>
-                        <h1>About Our Homestay</h1>
+                        <h1>Best Homestays In Munnar - Your Kerala Escape</h1>
                         <p className="mt-4">
-                            Stay in a traditional Kerala home where tranquility and cleanliness come first. With soothing mountain views and a naturally calm atmosphere, it’s the perfect retreat for travellers seeking an immersive, genuine Munnar experience.
+                            Stay in a traditional Kerala home where tranquility and cleanliness come first. With soothing mountain views and a naturally calm atmosphere, Krish Homestay is the perfect retreat for travellers seeking an immersive, genuine Munnar experience.
                         </p>
                         <p className="mt-4">
                             We value silence and nature, offering a peaceful environment for families, couples, and remote workers.
@@ -103,7 +103,7 @@ const Home = () => {
                         </div>
                     </div>
                     <div>
-                        <img src="/assets/about_image.jpg" alt="About Krish Homestay" style={{ width: '100%', borderRadius: '20px', boxShadow: 'var(--shadow)' }} />
+                        <img src="/assets/about_image.jpg" alt="Traditional Kerala Homestay in Munnar - Krish Homestay Exterior" style={{ width: '100%', borderRadius: '20px', boxShadow: 'var(--shadow)' }} />
                     </div>
                 </div>
             </section>
@@ -111,7 +111,7 @@ const Home = () => {
             {/* Amenities */}
             <section id="amenities" className="section" style={{ background: 'white' }}>
                 <div className="container">
-                    <h1 className="text-center mb-4">Amenities</h1>
+                    <h2 className="text-center mb-4">Our Premium Amenities</h2>
                     <div className="grid-3">
                         <div className="glass-card">
                             <h3 className="mb-4" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><Shield color="var(--primary)" /> Essential & Comfort</h3>
@@ -187,14 +187,14 @@ const Home = () => {
                         <p className="mt-2">Known for the natural echo phenomenon amid the hills and lake-side atmosphere. Great for a fun outing.</p>
                     </div>
                     <div className="glass-card">
-                        <img src="/assets/view.png" alt="Attukad Waterfalls" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '15px' }} />
+                        <img src="/assets/view.png" alt="Attukad Waterfalls near Munnar Homestays" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '15px' }} />
                         <h3>Attukad Waterfalls</h3>
-                        <p className="mt-2">A scenic waterfall nestled within tea plantations. Perfect for nature lovers and a short trek.</p>
+                        <p className="mt-2">A scenic waterfall nestled within tea plantations. Perfect for nature lovers and a short trek near our homestay in Munnar.</p>
                     </div>
                     <div className="glass-card">
-                        <img src="/assets/about_image.jpg" alt="Tea Museum" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '15px' }} />
+                        <img src="/assets/about_image.jpg" alt="Tea Museum Munnar Cultural Experience" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '15px' }} />
                         <h3>Tea Museum</h3>
-                        <p className="mt-2">A cultural-educational experience showing the history of the region’s tea industry.</p>
+                        <p className="mt-2">A cultural-educational experience showing the history of the region’s tea industry, a must-visit while staying at one of the best homestays in Munnar.</p>
                     </div>
                     <div className="glass-card">
                         <img src="/assets/gallery/Sengulam Dam.jpg" alt="Sengulam Dam" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '15px' }} />
@@ -285,7 +285,7 @@ const Home = () => {
                 <div className="container grid-3">
                     <div>
                         <h3 style={{ color: 'white' }}>Krish Homestay</h3>
-                        <p className="mt-4">Your home away from home in Munnar.</p>
+                        <p className="mt-4">Your home away from home — recognized as one of the most tranquil <strong>homestays in Munnar</strong>.</p>
                     </div>
                     <div>
                         <h3 style={{ color: 'white' }}>Contact Us</h3>

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /adminpanel
+Disallow: /admin/dashboard
+
+Sitemap: https://krishhomestay.com/sitemap.xml
