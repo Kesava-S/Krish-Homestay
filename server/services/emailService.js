@@ -62,9 +62,9 @@ async function sendConfirmationEmail(bookingDetails) {
 
         <!-- Info -->
         <p style="font-size: 14px; line-height: 1.6;">
-          🕒 <strong>Check-in time:</strong> 12:00 PM  
+          🕒 <strong>Check-in time:</strong> 3:00 PM – 6:00 PM  <br>
           <br>
-          🕚 <strong>Check-out time:</strong> 11:00 AM
+          🕚 <strong>Check-out time:</strong> 8:00 AM – 11:00 AM
         </p>
 
         <p style="font-size: 14px; line-height: 1.6;">

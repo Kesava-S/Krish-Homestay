@@ -212,8 +212,8 @@ const Home = () => {
                         <div className="glass-card">
                             <h3>Check-in & Check-out</h3>
                             <ul className="mt-3" style={{ listStyle: 'none', paddingLeft: 0 }}>
-                                <li><strong>Check-in:</strong> 2:00 PM – 3:00 PM</li>
-                                <li><strong>Check-out:</strong> 10:00 AM – 11:00 AM</li>
+                                <li><strong>Check-in:</strong> 3:00 PM – 6:00 PM</li>
+                                <li><strong>Check-out:</strong> 8:00 AM – 11:00 AM</li>
                                 <li style={{ fontSize: '0.9rem', marginTop: '10px' }}>Early/Late options subject to availability.</li>
                             </ul>
                         </div>
